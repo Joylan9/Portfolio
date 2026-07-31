@@ -5,7 +5,7 @@ export const FOOTER_LINKS: FooterLink[] = [
     name: 'LinkedIn',
     hoverText: 'Connect with me',
     icon: 'icons/linkedin.svg',
-    url: 'https://linkedin.com/in/joylan-dsouza',
+    url: 'https://linkedin.com/in/joylan-dsouza-31b056263',
   },
   {
     name: 'GitHub',

@@ -9,54 +9,118 @@ import * as THREE from "three";
 import { WORK_TIMELINE } from "@constants";
 import { WorkTimelinePoint } from "@types";
 
-const reusableLeft = new THREE.Vector3(-0.3, 0, -0.1);
-const reusableRight = new THREE.Vector3(0.3, 0, -0.1);
+/**
+ * Layout constants for timeline entries.
+ *
+ * Vertical stack from top of text group:
+ *   YEAR_Y        = 0      (year badge, top of stack)
+ *   TITLE_Y       = -0.55  (title, below year with gap)
+ *   SUBTITLE_Y    = title bottom + SUBTITLE_GAP (calculated from title height)
+ *
+ * Horizontal offset from curve point:
+ *   TEXT_OFFSET_X  = 0.5 (left or right, enough to clear the box marker)
+ *
+ * Z-layering:
+ *   Line:    z = -0.3 (behind everything)
+ *   Marker:  z = -0.1 (middle layer)
+ *   Text:    z = 0.05 (front, always readable)
+ */
+const TEXT_OFFSET_X = 0.5;
+const YEAR_Y = 0;
+const TITLE_Y = -0.4;
+const TITLE_FONT_SIZE = 0.55;
+const TITLE_MAX_WIDTH = 3.2;
+const SUBTITLE_FONT_SIZE = 0.2;
+const YEAR_FONT_SIZE = 0.3;
+const TEXT_Z = 0.05;       // Text layer — in front
+const MARKER_Z = -0.1;     // Marker layer — middle
+const LINE_Z = -0.3;       // Line layer — behind everything
 
 const TimelinePoint = ({ point, diff }: { point: WorkTimelinePoint, diff: number }) => {
-  const getPoint = useMemo(() => {
-    switch (point.position) {
-      case 'left': return reusableLeft;
-      case 'right': return reusableRight;
-      default: return new THREE.Vector3();
-    }
-  }, [point.position]);
+  const isLeft = point.position === 'left';
+  const textAlign = isLeft ? 'right' : 'left';
+  const xOffset = isLeft ? -TEXT_OFFSET_X : TEXT_OFFSET_X;
 
-  const textAlign = point.position === 'left' ? 'right' : 'left';
+  // Estimate title height for subtitle positioning
+  // Title wraps at TITLE_MAX_WIDTH; estimate lines from title length
+  const titleCharsPerLine = Math.floor(TITLE_MAX_WIDTH / (TITLE_FONT_SIZE * 0.55));
+  const titleLines = Math.ceil(point.title.length / Math.max(titleCharsPerLine, 1));
+  const titleHeight = titleLines * TITLE_FONT_SIZE * 1.2; // 1.2 = line height factor
+  const subtitleY = TITLE_Y - titleHeight - 0.12; // 0.12 gap between title and subtitle
+
+  const fillOpacity = 2 - 2 * diff;
 
   const textProps: Partial<TextProps> = useMemo(() => ({
     font: "./Vercetti-Regular.woff",
     color: "white",
     anchorX: textAlign,
-    fillOpacity: 2 - 2 * diff,
-  }), [textAlign, diff]);
+    fillOpacity,
+    outlineWidth: 0.015,
+    outlineColor: "black",
+    outlineOpacity: Math.min(fillOpacity, 0.7),
+  }), [textAlign, fillOpacity]);
 
   const titleProps = useMemo(() => ({
     ...textProps,
     font: "./soria-font.ttf",
-    fontSize: 0.6,
-    maxWidth: 3,
+    fontSize: TITLE_FONT_SIZE,
+    maxWidth: TITLE_MAX_WIDTH,
+    anchorY: 'top' as const,
+    outlineWidth: 0.02,
   }), [textProps]);
 
   return (
     <group position={point.point} scale={isMobile ? 0.35 : 0.6}>
-      <Box args={[0.2, 0.2, 0.2]} position={[0, 0, -0.1]} scale={[1 - diff, 1 - diff, 1 - diff]}>
+      {/* Marker box — middle z-layer */}
+      <Box args={[0.2, 0.2, 0.2]} position={[0, 0, MARKER_Z]} scale={[1 - diff, 1 - diff, 1 - diff]}>
         <meshBasicMaterial color="white" wireframe />
         <Edges color="white" lineWidth={1.5} />
       </Box>
-      <group>
-        <group position={getPoint}>
-          <Text {...textProps} fontSize={0.3} position={[-diff / 2, 0, 0]}>
-            {point.year}
+
+      {/* Text container — front z-layer, offset left or right */}
+      <group position={[xOffset, 0, TEXT_Z]}>
+        {/* Semi-transparent backdrop for readability */}
+        <mesh
+          position={[
+            isLeft ? -TITLE_MAX_WIDTH / 2 : TITLE_MAX_WIDTH / 2,
+            (YEAR_Y + subtitleY) / 2,
+            -0.02,
+          ]}
+          renderOrder={-1}
+        >
+          <planeGeometry args={[TITLE_MAX_WIDTH + 0.4, Math.abs(subtitleY - YEAR_Y) + 0.8]} />
+          <meshBasicMaterial color="black" transparent opacity={Math.min(fillOpacity * 0.15, 0.15)} />
+        </mesh>
+
+        {/* Year badge — top of stack */}
+        <Text
+          {...textProps}
+          fontSize={YEAR_FONT_SIZE}
+          position={[0, YEAR_Y, 0]}
+        >
+          {point.year}
+        </Text>
+
+        {/* Title — below year with clear gap */}
+        <Text
+          {...titleProps}
+          position={[0, TITLE_Y, 0]}
+        >
+          {point.title}
+        </Text>
+
+        {/* Subtitle — below title, dynamically positioned based on estimated title height */}
+        {point.subtitle && (
+          <Text
+            {...textProps}
+            fontSize={SUBTITLE_FONT_SIZE}
+            maxWidth={TITLE_MAX_WIDTH}
+            overflowWrap="break-word"
+            position={[0, subtitleY, 0]}
+          >
+            {point.subtitle}
           </Text>
-          <group position={[0, -0.5, 0]}>
-            <Text {...titleProps} fontSize={0.6} maxWidth={3} position={[0, -diff / 2, 0]}>
-              {point.title}
-            </Text>
-            <Text {...textProps} fontSize={0.2} position={[0, -0.4 - diff, 0]}>
-              {point.subtitle}
-            </Text>
-          </group>
-        </group>
+        )}
       </group>
     </group>
   );
@@ -124,7 +188,8 @@ const Timeline = ({ progress }: { progress: number }) => {
   }, [isActive]);
 
   return (
-    <group position={[0, -0.1, -0.1]}>
+    <group position={[0, -0.1, LINE_Z]}>
+      {/* Connector lines — at LINE_Z, behind all text */}
       <Line points={visibleCurvePoints} color="white" lineWidth={3} />
       {visibleDashedCurvePoints.length > 0 && (
         <Line
@@ -136,6 +201,7 @@ const Timeline = ({ progress }: { progress: number }) => {
           gapSize={0.25}
         />
       )}
+      {/* Timeline entries — text is at TEXT_Z (in front of line) */}
       <group ref={groupRef}>
         {visibleTimelinePoints.map((point, i) => {
           const diff = Math.min(2 * Math.max(i - (progress * (timeline.length - 1)), 0), 1);
