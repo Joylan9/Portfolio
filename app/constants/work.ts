@@ -1,34 +1,33 @@
 import * as THREE from "three";
 import { WorkTimelinePoint } from "../types";
 
-// TODO: Replace with your own education and work experience
 export const WORK_TIMELINE: WorkTimelinePoint[] = [
   {
     point: new THREE.Vector3(0, 0, 0),
-    year: '2020',
-    title: 'Your University',
-    subtitle: 'Your Degree',
+    year: '2019',
+    title: 'Don Bosco School',
+    subtitle: 'S.S.L.C · 56.57%',
     position: 'right',
   },
   {
     point: new THREE.Vector3(-4, -4, -3),
-    year: '2022',
-    title: 'Company One',
-    subtitle: 'Your Role',
+    year: '2020',
+    title: 'Sri Venkataramana PU College',
+    subtitle: 'Pre-University (PCMC) · 76.80%',
     position: 'left',
   },
   {
     point: new THREE.Vector3(-3, -1, -6),
-    year: '2023',
-    title: 'Company Two',
-    subtitle: 'Your Role',
+    year: '2022',
+    title: 'Canara Engineering College',
+    subtitle: 'B.E. in Computer Science · CGPA: 8.14',
     position: 'left',
   },
   {
     point: new THREE.Vector3(0, -1, -10),
-    year: '2024',
-    title: 'Company Three',
-    subtitle: 'Your Role',
+    year: '2025',
+    title: 'SoVir Technologies LLP',
+    subtitle: 'Web Developer Intern',
     position: 'left',
   },
   {

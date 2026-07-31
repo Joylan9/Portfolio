@@ -35,16 +35,6 @@ Replace the following placeholders with your own content:
 - [ ] **OpenGraph Image**: Add your own `app/opengraph-image.png`
 - [ ] **Favicon**: Replace `app/favicon.ico` and `public/favicon-*.png`
 
-## Deployment
-
-This project deploys to GitHub Pages via the included GitHub Actions workflow (`.github/workflows/nextjs.yml`).
-
-To set up:
-1. Push this repo to your GitHub
-2. Enable GitHub Pages in your repo settings (source: GitHub Actions)
-3. Optionally set `GH_PAGES_CUSTOM_DOMAIN` secret for a custom domain
-4. Optionally set `NEXT_PUBLIC_GA_ID` secret for Google Analytics
-
 ## License
 
 Based on a template by [mohitvirli](https://github.com/mohitvirli).

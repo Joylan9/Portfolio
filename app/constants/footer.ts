@@ -5,25 +5,13 @@ export const FOOTER_LINKS: FooterLink[] = [
     name: 'LinkedIn',
     hoverText: 'Connect with me',
     icon: 'icons/linkedin.svg',
-    url: '#', // TODO: Add your LinkedIn URL
+    url: 'https://linkedin.com/in/joylan-dsouza',
   },
   {
     name: 'GitHub',
     hoverText: 'Open Sourcing',
     icon: 'icons/github.svg',
-    url: '#', // TODO: Add your GitHub URL
-  },
-  {
-    name: 'Spotify',
-    hoverText: 'Curated playlists',
-    icon: 'icons/spotify.svg',
-    url: '#', // TODO: Add your Spotify URL
-  },
-  {
-    name: 'Instagram',
-    hoverText: '@yourhandle',
-    icon: 'icons/instagram.svg',
-    url: '#', // TODO: Add your Instagram URL
+    url: 'https://github.com/Joylan9',
   },
   {
     name: 'Resume',

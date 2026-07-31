@@ -15,12 +15,12 @@ const vercettiFont = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com/'),
-  title: "Your Name Here ✌️",
-  description: "A developer by profession, a creative at heart.",
-  keywords: "Your Name Here, Frontend Engineer, React Developer, Three.js, Creative Developer, Web Development, JavaScript, TypeScript, Portfolio",
-  authors: [{ name: "Your Name Here" }],
-  creator: "Your Name Here",
-  publisher: "Your Name Here",
+  title: "Joylan Dsouza ✌️",
+  description: "Full-Stack Developer & AI Enthusiast. B.E. in Computer Science & Engineering graduate building scalable web applications and AI-powered solutions.",
+  keywords: "Joylan Dsouza, Full-Stack Developer, React Developer, Node.js, Express.js, MongoDB, FastAPI, Python, AI Developer, Three.js, Web Development, TypeScript, Portfolio",
+  authors: [{ name: "Joylan Dsouza" }],
+  creator: "Joylan Dsouza",
+  publisher: "Joylan Dsouza",
   formatDetection: {
     email: false,
     address: false,
@@ -37,16 +37,16 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Your Name Here - Developer",
-    description: "A developer by profession, a creative at heart.",
-    siteName: "Your Name Here's Portfolio",
+    title: "Joylan Dsouza - Full-Stack Developer",
+    description: "Full-Stack Developer & AI Enthusiast. Building scalable web applications and AI-powered solutions.",
+    siteName: "Joylan Dsouza's Portfolio",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Your Name Here - Developer",
-    description: "A developer by profession, a creative at heart.",
+    title: "Joylan Dsouza - Developer",
+    description: "Full-Stack Developer & AI Enthusiast. Building scalable web applications and AI-powered solutions.",
   },
 };
 
