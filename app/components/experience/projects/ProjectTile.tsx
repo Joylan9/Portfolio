@@ -14,6 +14,10 @@ const CARD_PADDING_X = 0.28;
 const TITLE_MAX_WIDTH = CARD_WIDTH - CARD_PADDING_X * 2;
 const TITLE_BOX_HEIGHT = 0.82;
 
+// Expanded card dimensions
+const EXPANDED_CARD_SCALE_Y = 1.35;
+const EXPANDED_TITLE_BOX_SCALE_Y = 2.6;
+
 interface ProjectTileProps {
   project: Project;
   index: number;
@@ -34,6 +38,8 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
   const projectRef = useRef<THREE.Group>(null);
   const cardMeshRef = useRef<THREE.Mesh>(null);
   const titleRef = useRef<THREE.Object3D>(null);
+  const titleBoxRef = useRef<THREE.Mesh>(null);
+  const dividerRef = useRef<THREE.Mesh>(null);
   const dateGroupRef = useRef<THREE.Group>(null);
   const subtextRef = useRef<THREE.Object3D>(null);
   const buttonRef = useRef<THREE.Group>(null);
@@ -76,11 +82,34 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
       .to(subtextRef.current.position, { y: hovered ? -0.1 : -0.98 }, 0)
       .to(subtextRef.current, { fillOpacity: hovered ? 1 : 0, duration: 0.4 }, 0)
       .to(dateGroupRef.current.position, { y: hovered ? 0.9 : 0.82 }, 0)
-      .to(cardMeshRef.current.scale, { y: hovered ? 1.35 : 1 }, 0)
+      // Card background scales up
+      .to(cardMeshRef.current.scale, { y: hovered ? EXPANDED_CARD_SCALE_Y : 1 }, 0)
       .to(cardMeshRef.current.material, { opacity: hovered ? 0.95 : 0.3 }, 0)
       .to(cardMeshRef.current.position, { y: hovered ? 0.25 : 0 }, 0);
 
-    if (project.url && buttonRef.current) {
+    // Animate the title box to grow and contain the description
+    if (titleBoxRef.current) {
+      hoverAnimRef.current
+        .to(titleBoxRef.current.scale, {
+          y: hovered ? EXPANDED_TITLE_BOX_SCALE_Y : 1,
+        }, 0)
+        .to(titleBoxRef.current.position, {
+          y: hovered ? -0.28 : 0.02,
+        }, 0);
+    }
+
+    // Show/hide the divider line
+    if (dividerRef.current) {
+      hoverAnimRef.current
+        .to(dividerRef.current.scale, {
+          x: hovered ? 1 : 0,
+        }, 0)
+        .to(dividerRef.current.position, {
+          y: hovered ? 0.12 : 0.02,
+        }, 0);
+    }
+
+    if (project.urls?.length && buttonRef.current) {
       hoverAnimRef.current
         .to(buttonRef.current.scale, { y: hovered ? 1 : 0, x: hovered ? 1 : 0 }, 0)
         .to(buttonRef.current.position, { z: hovered ? 0.3 : -1 }, 0);
@@ -99,11 +128,12 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (!project.url) return;
+    const firstUrl = project.urls?.[0]?.url || project.url;
+    if (!firstUrl) return;
     const button = e.eventObject;
     gsap.to(button.position, { z: 0, duration: 0.1 })
       .then(() => gsap.to(button.position, { z: 0.3, duration: 0.3 }));
-    setTimeout(() => window.open(project.url, '_blank'), 50);
+    setTimeout(() => window.open(firstUrl, '_blank'), 50);
   };
 
   const handlePointerOver = (e: ThreeEvent<MouseEvent>) => {
@@ -113,6 +143,8 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
     }
   };
 
+  const hasUrl = !!(project.url || project.urls?.length);
+
   return (
     <group
       position={position}
@@ -120,18 +152,28 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
       onClick={onClick}
       onPointerOver={handlePointerOver}
       onPointerOut={() => !isMobile && isProjectSectionActive && setDesktopHovered(false)}>
-      <group ref={projectRef}>
+      <group ref={projectRef} renderOrder={hovered ? 10 : 0}>
+        {/* Card background */}
         <mesh ref={cardMeshRef}>
           <planeGeometry args={[CARD_WIDTH, CARD_HEIGHT, 1]} />
-          <meshBasicMaterial color="#FFF" transparent opacity={0.3}/>
-          {/* <meshPhysicalMaterial transmission={1} roughness={0.3} /> */}
+          <meshBasicMaterial color="#FFF" transparent opacity={0.3} depthWrite={!hovered} />
           <Edges color="black" lineWidth={1.5} />
         </mesh>
-        <mesh position={[0, 0.02, 0.09]}>
+
+        {/* Title box outline — this now animates to contain the description */}
+        <mesh ref={titleBoxRef} position={[0, 0.02, 0.09]}>
           <planeGeometry args={[CARD_WIDTH - 0.28, TITLE_BOX_HEIGHT, 1]} />
           <meshBasicMaterial color="#FFF" transparent opacity={0} />
           <Edges color="black" lineWidth={1} />
         </mesh>
+
+        {/* Divider line between title and description (hidden by default) */}
+        <mesh ref={dividerRef} position={[0, 0.02, 0.095]} scale={[0, 1, 1]}>
+          <planeGeometry args={[CARD_WIDTH - 0.56, 0.01, 1]} />
+          <meshBasicMaterial color="black" transparent opacity={0.4} />
+        </mesh>
+
+        {/* Title text */}
         <Text
           ref={titleRef}
           {...titleProps}
@@ -139,6 +181,8 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
           fontSize={titleFontSize}>
           {project.title}
         </Text>
+
+        {/* Date badge */}
         <group ref={dateGroupRef} position={[1.62, 0.82, 0.12]}>
           <mesh>
             <planeGeometry args={[1.1, 0.34, 1]} />
@@ -152,6 +196,8 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
             {project.date.toUpperCase()}
           </Text>
         </group>
+
+        {/* Description text (revealed on hover) */}
         <Text
           ref={subtextRef}
           {...subtitleProps}
@@ -161,7 +207,9 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
           fontSize={0.2}>
           {project.subtext}
         </Text>
-        {project.url && (
+
+        {/* View button */}
+        {hasUrl && (
           <group
             ref={buttonRef}
             position={[1.3, -0.6, -1]}
