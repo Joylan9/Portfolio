@@ -15,33 +15,21 @@ const ProjectsCarousel = () => {
     setSelectedId(id === selectedId ? null : id);
   };
   const tiles = useMemo(() => {
-    const fov = Math.PI;
-    const distance = 10;
-
-    const columns = Math.ceil(PROJECTS.length / 2);
+    const cardWidth = 5.4;
+    const gap = 0.8;
+    const rowWidth = PROJECTS.length * cardWidth + (PROJECTS.length - 1) * gap;
+    const startX = -rowWidth / 2 + cardWidth / 2;
 
     return PROJECTS.map((project, i) => {
-      const row = i % 2; // 0 or 1
-      const column = Math.floor(i / 2);
+      const x = startX + i * (cardWidth + gap);
 
-      const angle = (fov / columns) * column;
-
-      const z = -distance * Math.sin(angle);
-      const x = -distance * Math.cos(angle);
-
-      const rotY = Math.PI / 2 - angle;
-
-      // vertical stacking
-      const y = row === 0 ? 3.25 : 1;
-      const datePosition = row === 0 ? 'top' : 'bottom';
       return (
         <ProjectTile
           key={i}
-          datePosition={datePosition}
           project={project}
           index={i}
-          position={[x, y, z]}
-          rotation={[0, rotY, 0]}
+          position={[x, 2.1, -8]}
+          rotation={[0, 0, 0]}
           activeId={activeId}
           onClick={() => onClick(i)}
         />
