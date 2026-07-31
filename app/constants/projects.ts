@@ -6,7 +6,7 @@ export const PROJECTS: Project[] = [
     date: '2026',
     subtext: 'Agentic AI backend with goal decomposition, tool routing, and plan execution using local LLM (LLaMA3). Features RAG pipeline with sentence-transformer embeddings, enterprise patterns, and Docker deployment.',
     urls: [
-      { text: 'GitHub', url: 'https://github.com/Joylan9' },
+      { text: 'GitHub', url: 'https://github.com/Joylan9/genai-agent-sprint' },
     ],
   },
   {

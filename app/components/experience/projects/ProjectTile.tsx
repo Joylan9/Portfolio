@@ -15,8 +15,8 @@ const TITLE_MAX_WIDTH = CARD_WIDTH - CARD_PADDING_X * 2;
 const TITLE_BOX_HEIGHT = 0.82;
 
 // Expanded card dimensions
-const EXPANDED_CARD_SCALE_Y = 1.35;
-const EXPANDED_TITLE_BOX_SCALE_Y = 2.6;
+const EXPANDED_CARD_SCALE_Y = 1.55;
+const EXPANDED_TITLE_BOX_SCALE_Y = 3.2;
 
 interface ProjectTileProps {
   project: Project;
@@ -85,7 +85,7 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
       // Card background scales up
       .to(cardMeshRef.current.scale, { y: hovered ? EXPANDED_CARD_SCALE_Y : 1 }, 0)
       .to(cardMeshRef.current.material, { opacity: hovered ? 0.95 : 0.3 }, 0)
-      .to(cardMeshRef.current.position, { y: hovered ? 0.25 : 0 }, 0);
+      .to(cardMeshRef.current.position, { y: hovered ? 0.35 : 0 }, 0);
 
     // Animate the title box to grow and contain the description
     if (titleBoxRef.current) {
@@ -112,7 +112,7 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
     if (project.urls?.length && buttonRef.current) {
       hoverAnimRef.current
         .to(buttonRef.current.scale, { y: hovered ? 1 : 0, x: hovered ? 1 : 0 }, 0)
-        .to(buttonRef.current.position, { z: hovered ? 0.3 : -1 }, 0);
+        .to(buttonRef.current.position, { y: hovered ? -1.45 : -1.45, z: hovered ? 0.3 : -1 }, 0);
     }
   }, [hovered]);
 
@@ -212,7 +212,7 @@ const ProjectTile = ({ project, index, position, rotation, activeId, onClick }: 
         {hasUrl && (
           <group
             ref={buttonRef}
-            position={[1.3, -0.6, -1]}
+            position={[1.3, -1.45, -1]}
             scale={[0, 0, 1]}
             onClick={handleClick}
             onPointerOver={() => document.body.style.cursor = 'pointer'}
