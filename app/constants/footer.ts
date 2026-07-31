@@ -14,6 +14,12 @@ export const FOOTER_LINKS: FooterLink[] = [
     url: 'https://github.com/Joylan9',
   },
   {
+    name: 'Instagram',
+    hoverText: 'Follow me',
+    icon: 'icons/instagram.svg',
+    url: 'https://www.instagram.com/joylan_7?igsh=NzhhdHlrNnR5OXZ6',
+  },
+  {
     name: 'Resume',
     hoverText: 'Download',
     icon: 'icons/file.svg',
