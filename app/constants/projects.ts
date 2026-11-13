@@ -2,6 +2,14 @@ import { Project } from "../types";
 
 export const PROJECTS: Project[] = [
   {
+    title: 'Isha · Voltex Smart Home Platform',
+    date: '2026',
+    subtext: 'Multi-home smart-home PWA for live control of lights, fans and AC via Home Assistant and ESP32. Next.js 16, Fastify 5, PostgreSQL, Redis, WebSockets and a private WireGuard network.',
+    urls: [
+      { text: 'Live', url: 'https://ishaliving.co.in' },
+    ],
+  },
+  {
     title: 'Enterprise Agentic AI Platform',
     date: '2026',
     subtext: 'Agentic AI backend with goal decomposition, tool routing, and plan execution using local LLM (LLaMA3). Features RAG pipeline with sentence-transformer embeddings, enterprise patterns, and Docker deployment.',

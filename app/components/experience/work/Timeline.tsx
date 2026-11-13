@@ -36,6 +36,12 @@ const TEXT_Z = 0.05;       // Text layer — in front
 const MARKER_Z = -0.1;     // Marker layer — middle
 const LINE_Z = -0.3;       // Line layer — behind everything
 
+// On mobile the camera sits right above the active marker, and a portrait
+// screen is only ~1 world unit wide there. Cards are scaled to fit, and the
+// camera slides toward the card's text side so the whole card is in frame.
+const MOBILE_SCALE = 0.24;
+const MOBILE_CARD_SHIFT = (TEXT_OFFSET_X + TITLE_MAX_WIDTH / 2) * MOBILE_SCALE;
+
 const TimelinePoint = ({ point, diff }: { point: WorkTimelinePoint, diff: number }) => {
   const isLeft = point.position === 'left';
   const textAlign = isLeft ? 'right' : 'left';
@@ -70,7 +76,7 @@ const TimelinePoint = ({ point, diff }: { point: WorkTimelinePoint, diff: number
   }), [textProps]);
 
   return (
-    <group position={point.point} scale={isMobile ? 0.35 : 0.6}>
+    <group position={point.point} scale={isMobile ? MOBILE_SCALE : 0.6}>
       {/* Marker box — middle z-layer */}
       <Box args={[0.2, 0.2, 0.2]} position={[0, 0, MARKER_Z]} scale={[1 - diff, 1 - diff, 1 - diff]}>
         <meshBasicMaterial color="white" wireframe />
@@ -142,7 +148,9 @@ const Timeline = ({ progress }: { progress: number }) => {
   useFrame((_, delta) => {
     if (isActive) {
       const position = curve.getPoint(progress);
-      camera.position.x = THREE.MathUtils.damp(camera.position.x, (isMobile ? -1 : -2) + position.x, 4, delta);
+      const active = timeline[Math.round(progress * (timeline.length - 1))];
+      const cardShift = isMobile ? (active.position === 'left' ? -1 : 1) * MOBILE_CARD_SHIFT : 0;
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, (isMobile ? -1 : -2) + position.x + cardShift, 4, delta);
       camera.position.y = THREE.MathUtils.damp(camera.position.y, -39 + position.z, 4, delta);
       camera.position.z = THREE.MathUtils.damp(camera.position.z, 13 - position.y, 4, delta);
     }
